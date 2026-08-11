@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DummyBankSystem | プレミアムオンラインバンキング</title>
+    <meta name="description" content="セキュアでモダンなグラスモフィズムデザインのダミー銀行システムシミュレータ。送金、定期預金、積立、2段階認証をサポート。">
+    <!-- PWA / iOS Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DummyBank">
+    <link rel="apple-touch-icon" href="https://img.icons8.com/color/192/000000/bank-building.png">
+    <!-- Google Fonts: Outfit & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="app-container">
+
+        <!-- ==================== 1. LOGIN SCREEN ==================== -->
+        <section id="login-screen" class="screen active">
+            <div class="glass-card login-card">
+                <div class="logo-area">
+                    <i class="fa-solid fa-building-columns bank-logo-icon"></i>
+                    <h1>DUMMY BANK</h1>
+                    <p class="subtitle">プレミアムオンラインバンキング</p>
+                </div>
+                <form id="login-form">
+                    <div class="input-group">
+                        <label for="login-username"><i class="fa-regular fa-user"></i> ユーザーID</label>
+                        <input type="text" id="login-username" placeholder="test または guest" required autocomplete="username">
+                    </div>
+                    <div class="input-group">
+                        <label for="login-password"><i class="fa-solid fa-key"></i> パスワード</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="login-password" placeholder="ユーザーIDと同じ値" required autocomplete="current-password">
+                            <button type="button" id="toggle-password-btn" aria-label="パスワードを表示する">
+                                <i class="fa-regular fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="login-error-banner" class="error-banner hidden">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <span id="login-error-message">IDまたはパスワードが正しくありません。</span>
+                    </div>
+                    <button type="submit" class="btn primary-btn btn-full">ログイン</button>
+                </form>
+                <div class="login-footer">
+                    <p>デモ用ID/PW: <strong>test</strong> または <strong>guest</strong></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== 2. DASHBOARD SCREEN ==================== -->
+        <section id="dashboard-screen" class="screen">
+            <header class="app-header">
+                <div class="header-logo">
+                    <i class="fa-solid fa-building-columns"></i>
+                    <span>DUMMY BANK</span>
+                </div>
+                <button id="logout-btn" class="header-btn" aria-label="ログアウト">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                </button>
+            </header>
+
+            <main class="content-area">
+                <!-- Cash Card -->
+                <div id="cash-card" class="cash-card">
+                    <div class="card-glow"></div>
+                    <div class="card-inner">
+                        <div class="card-top">
+                            <span class="bank-title">DUMMY BANK CASH CARD</span>
+                            <span class="card-brand"><i class="fa-brands fa-cc-visa"></i></span>
+                        </div>
+                        <div class="card-middle">
+                            <span class="balance-label">ご利用可能残高</span>
+                            <h2 id="checking-balance" class="balance-value">¥0</h2>
+                        </div>
+                        <div id="dashboard-paypay-container" class="hidden" style="margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 12px; display: flex; justify-content: space-between;">
+                            <span>PayPay残高</span>
+                            <span id="dashboard-paypay-balance" style="font-weight: bold; font-size: 1.1rem;">¥0</span>
+                        </div>
+                        <div class="card-bottom">
+                            <div class="card-info-item">
+                                <span class="info-label">口座番号</span>
+                                <span id="card-account-number" class="info-value">000-0000-000</span>
+                            </div>
+                            <div class="card-info-item">
+                                <span class="info-label">名義人</span>
+                                <span id="card-owner-name" class="info-value">TEST TARO</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Menu Grid -->
+                <section class="menu-section">
+                    <h3>便利メニュー</h3>
+                    <div class="menu-grid">
+                        <button id="menu-transfer-btn" class="menu-item-card">
+                            <i class="fa-solid fa-paper-plane menu-icon"></i>
+                            <span class="menu-title">お振込・振替</span>
+                        </button>
+                        <button id="menu-savings-btn" class="menu-item-card">
+                            <i class="fa-solid fa-chart-line menu-icon"></i>
+                            <span class="menu-title">定期・積立</span>
+                        </button>
+                        <button id="menu-loans-btn" class="menu-item-card">
+                            <i class="fa-solid fa-credit-card menu-icon"></i>
+                            <span class="menu-title">カードローン</span>
+                        </button>
+                        <button id="menu-settings-btn" class="menu-item-card">
+                            <i class="fa-solid fa-sliders menu-icon"></i>
+                            <span class="menu-title">各種お手続き</span>
+                        </button>
+                        <button id="menu-paypay-charge-btn" class="menu-item-card">
+                            <i class="fa-solid fa-arrow-right-to-bracket menu-icon" style="color:#e50020;"></i>
+                            <span class="menu-title">PayPayへ入金</span>
+                        </button>
+                        <button id="menu-paypay-withdraw-btn" class="menu-item-card">
+                            <i class="fa-solid fa-arrow-right-from-bracket menu-icon" style="color:#e50020;"></i>
+                            <span class="menu-title">PayPayから出金</span>
+                        </button>
+                        <button id="menu-paypay-send-btn" class="menu-item-card">
+                            <i class="fa-solid fa-paper-plane menu-icon" style="color:#e50020;"></i>
+                            <span class="menu-title">PayPayを送る</span>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Transactions History -->
+                <section class="history-section">
+                    <h3>取引履歴 (最新5件)</h3>
+                    <div id="transaction-list" class="transaction-list">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </section>
+            </main>
+        </section>
+
+        <!-- ==================== 3. TRANSFER SCREEN ==================== -->
+        <section id="transfer-screen" class="screen">
+            <header class="app-header">
+                <button id="transfer-back-btn" class="header-btn" aria-label="戻る">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <span class="header-title">お振込・振替</span>
+                <div class="placeholder-icon"></div>
+            </header>
+
+            <main class="content-area scrollable">
+                <!-- Source Account -->
+                <div class="source-card">
+                    <span class="source-label">引出口座（本人）</span>
+                    <h4 id="transfer-owner-info" class="source-title">TEST TARO (000-0000-000)</h4>
+                    <p class="source-balance">お引出可能残高: <span id="transfer-available-balance" class="highlight-text">¥0</span></p>
+                </div>
+
+                <h3>振込先情報の入力</h3>
+                <form id="transfer-form" class="form-container">
+                    <!-- Bank Select -->
+                    <div class="form-group">
+                        <label for="transfer-bank">金融機関</label>
+                        <select id="transfer-bank" required>
+                            <option value="001">[001] ダミー銀行</option>
+                            <option value="002">[002] サンプル銀行</option>
+                            <option value="003">[003] テスト信託銀行</option>
+                        </select>
+                    </div>
+
+                    <!-- Branch Code -->
+                    <div class="form-group">
+                        <label for="transfer-branch">支店コード (3桁)</label>
+                        <input type="text" id="transfer-branch" placeholder="例: 001" maxlength="3" required pattern="\d{3}">
+                    </div>
+
+                    <!-- Account Type -->
+                    <div class="form-group">
+                        <label for="transfer-account-type">口座種別</label>
+                        <select id="transfer-account-type" required>
+                            <option value="普通預金">普通預金</option>
+                            <option value="当座預金">当座預金</option>
+                            <option value="貯蓄預金">貯蓄預金</option>
+                        </select>
+                    </div>
+
+                    <!-- Account Number and Verification -->
+                    <div class="form-group inline-group">
+                        <div class="input-col">
+                            <label for="transfer-account-number">口座番号</label>
+                            <input type="text" id="transfer-account-number" placeholder="例: 1234567" required pattern="[\d\-]+">
+                        </div>
+                        <button type="button" id="verify-account-btn" class="btn secondary-btn align-bottom-btn">口座確認</button>
+                    </div>
+
+                    <!-- Verified Receiver Display -->
+                    <div id="verified-receiver-card" class="verified-card hidden">
+                        <i class="fa-solid fa-circle-check verify-success-icon"></i>
+                        <div>
+                            <span class="verified-label">受取人名義</span>
+                            <p id="verified-receiver-name" class="verified-value">SAMURAI JIRO 様</p>
+                        </div>
+                    </div>
+
+                    <!-- Error display inside form -->
+                    <div id="transfer-error-banner" class="error-banner hidden">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <span id="transfer-error-message"></span>
+                    </div>
+
+                    <!-- Amount (Enabled only after verification) -->
+                    <div class="form-group">
+                        <label for="transfer-amount">振込金額</label>
+                        <div class="suffix-input-wrapper">
+                            <input type="number" id="transfer-amount" placeholder="例: 10000" disabled required min="1">
+                            <span class="suffix">円</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="transfer-submit-btn" class="btn primary-btn btn-full" disabled>振込を実行する</button>
+                </form>
+            </main>
+        </section>
+
+        <!-- ==================== 4. SAVINGS SCREEN ==================== -->
+        <section id="savings-screen" class="screen">
+            <header class="app-header">
+                <button id="savings-back-btn" class="header-btn" aria-label="戻る">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <span class="header-title">定期・積立</span>
+                <div class="placeholder-icon"></div>
+            </header>
+
+            <!-- Savings Tabs -->
+            <div class="tabs-bar">
+                <button id="savings-tab-list" class="tab-btn active">預入一覧</button>
+                <button id="savings-tab-apply" class="tab-btn">新規お申し込み</button>
+            </div>
+
+            <main class="content-area scrollable">
+                <!-- Tab content 1: Dashboard list -->
+                <div id="savings-list-content" class="tab-content active-content">
+                    <div class="savings-total-card">
+                        <span class="savings-total-label">定期・積立 合計残高</span>
+                        <h2 id="savings-total-balance">¥0</h2>
+                        <p id="savings-account-count">保有口座数: 0口</p>
+                    </div>
+
+                    <div class="list-header-row">
+                        <h3>ご契約一覧</h3>
+                        <button id="savings-apply-shortcut-btn" class="text-link-btn"><i class="fa-solid fa-plus"></i> 新規お申し込み</button>
+                    </div>
+
+                    <div id="savings-account-list" class="savings-account-list">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </div>
+
+                <!-- Tab content 2: Application Form -->
+                <div id="savings-apply-content" class="tab-content">
+                    <div class="source-card compact">
+                        <span class="source-label">引出元口座（普通預金）</span>
+                        <p class="source-balance compact-balance">ご利用可能残高: <span id="savings-source-balance" class="highlight-text">¥0</span></p>
+                    </div>
+
+                    <h3>お申し込み情報の入力</h3>
+                    <form id="savings-apply-form" class="form-container">
+                        <!-- Saving Type -->
+                        <div class="form-group">
+                            <label>預入種別</label>
+                            <div class="type-selector-row">
+                                <label class="type-card selected" id="type-fixed-label">
+                                    <input type="radio" name="savings-type" value="FIXED" checked class="hidden-radio">
+                                    <span>定期預金</span>
+                                </label>
+                                <label class="type-card" id="type-acc-label">
+                                    <input type="radio" name="savings-type" value="ACCUMULATION" class="hidden-radio">
+                                    <span>積立定期預金</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Amount (Fixed term: initial, Accumulation: target, monthly) -->
+                        <div id="savings-fixed-group" class="form-group">
+                            <label for="savings-fixed-amount">預入金額</label>
+                            <div class="suffix-input-wrapper">
+                                <input type="number" id="savings-fixed-amount" placeholder="例: 500000" min="1">
+                                <span class="suffix">円</span>
+                            </div>
+                        </div>
+
+                        <div id="savings-acc-group" class="form-group hidden">
+                            <div class="form-group">
+                                <label for="savings-acc-monthly">毎月の積立額</label>
+                                <div class="suffix-input-wrapper">
+                                    <input type="number" id="savings-acc-monthly" placeholder="例: 10000" min="1">
+                                    <span class="suffix">円</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="savings-acc-target">目標総金額 (任意)</label>
+                                <div class="suffix-input-wrapper">
+                                    <input type="number" id="savings-acc-target" placeholder="例: 240000" min="1">
+                                    <span class="suffix">円</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="savings-acc-day">毎月の振替指定日</label>
+                                <select id="savings-acc-day">
+                                    <option value="5">毎月 5 日</option>
+                                    <option value="10">毎月 10 日</option>
+                                    <option value="15">毎月 15 日</option>
+                                    <option value="20">毎月 20 日</option>
+                                    <option value="25" selected>毎月 25 日</option>
+                                    <option value="27">毎月 27 日</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Term Selection Chips -->
+                        <div class="form-group">
+                            <label>預入期間</label>
+                            <div class="term-chips-row">
+                                <button type="button" class="term-chip" data-months="6">6ヶ月</button>
+                                <button type="button" class="term-chip active" data-months="12">1年</button>
+                                <button type="button" class="term-chip" data-months="24">2年</button>
+                                <button type="button" class="term-chip" data-months="36">3年</button>
+                                <button type="button" class="term-chip" data-months="60">5年</button>
+                            </div>
+                        </div>
+
+                        <!-- Interest rate display -->
+                        <div class="interest-rate-card">
+                            <i class="fa-solid fa-arrow-trend-up trending-icon"></i>
+                            <div>
+                                <span class="rate-label">適用金利 (年利)</span>
+                                <h4 id="savings-interest-rate" class="rate-value">0.15%</h4>
+                            </div>
+                        </div>
+
+                        <!-- Maturity Instruction -->
+                        <div class="form-group">
+                            <label for="savings-instruction">満期時の取扱</label>
+                            <select id="savings-instruction" required>
+                                <option value="AUTO_RENEW_WITH_INTEREST">元利自動継続</option>
+                                <option value="AUTO_RENEW_PRINCIPAL_ONLY">元金自動継続</option>
+                                <option value="AUTO_CANCEL">自動解約（普通預金振込）</option>
+                            </select>
+                        </div>
+
+                        <!-- Error Banner -->
+                        <div id="savings-error-banner" class="error-banner hidden">
+                            <i class="fa-solid fa-circle-info"></i>
+                            <span id="savings-error-message"></span>
+                        </div>
+
+                        <button type="submit" class="btn primary-btn btn-full">預入を申し込む</button>
+                    </form>
+                </div>
+            </main>
+        </section>
+
+        <!-- ==================== 5. SETTINGS SCREEN ==================== -->
+        <section id="settings-screen" class="screen">
+            <!-- Settings Portal Content -->
+            <div id="settings-portal-content" class="sub-screen-view active-view">
+                <header class="app-header">
+                    <button id="settings-back-btn" class="header-btn" aria-label="戻る">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <span class="header-title">各種お手続き</span>
+                    <div class="placeholder-icon"></div>
+                </header>
+
+                <main class="content-area scrollable">
+                    <h3>セキュリティ設定</h3>
+                    <div class="settings-list">
+                        <div id="settings-2fa-item" class="settings-item-card clickable-row">
+                            <div class="settings-row-left">
+                                <div class="settings-icon-box">
+                                    <i class="fa-solid fa-comment-sms"></i>
+                                </div>
+                                <div class="settings-row-meta">
+                                    <span class="row-title">2段階認証 (SMS認証)</span>
+                                    <span id="settings-2fa-status" class="row-status">未設定</span>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-right chevron-icon"></i>
+                        </div>
+                    </div>
+
+                    <h3 class="margin-top-h3">外部連携サービス</h3>
+                    <div class="settings-list">
+                        <div id="settings-paypay-item" class="settings-item-card clickable-row">
+                            <div class="settings-row-left">
+                                <div class="settings-icon-box" style="background-color: rgba(225, 29, 72, 0.1); color: #e11d48;">
+                                    <i class="fa-solid fa-link"></i>
+                                </div>
+                                <div class="settings-row-meta">
+                                    <span class="row-title">PayPay連携設定</span>
+                                    <span id="settings-paypay-status" class="row-status">未連携 (アカウントを連携する)</span>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-right chevron-icon"></i>
+                        </div>
+                    </div>
+
+                    <h3 class="margin-top-h3">その他のお手続き (準備中)</h3>
+                    <div class="settings-list dummy-list">
+                        <div class="settings-item-card dummy-setting-row">
+                            <div class="settings-row-left">
+                                <div class="settings-icon-box gray-box">
+                                    <i class="fa-solid fa-shield-halved"></i>
+                                </div>
+                                <div class="settings-row-meta">
+                                    <span class="row-title">暗証番号変更</span>
+                                    <span class="row-subtitle">暗証番号の再設定を行います</span>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-right chevron-icon"></i>
+                        </div>
+                        <div class="settings-item-card dummy-setting-row">
+                            <div class="settings-row-left">
+                                <div class="settings-icon-box gray-box">
+                                    <i class="fa-solid fa-envelope"></i>
+                                </div>
+                                <div class="settings-row-meta">
+                                    <span class="row-title">メールアドレス変更</span>
+                                    <span class="row-subtitle">通知用メールアドレスの変更</span>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-right chevron-icon"></i>
+                        </div>
+                        <div class="settings-item-card dummy-setting-row">
+                            <div class="settings-row-left">
+                                <div class="settings-icon-box gray-box">
+                                    <i class="fa-solid fa-scale-balanced"></i>
+                                </div>
+                                <div class="settings-row-meta">
+                                    <span class="row-title">取引限度額変更</span>
+                                    <span class="row-subtitle">1日あたりの振込限度額の変更</span>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-right chevron-icon"></i>
+                        </div>
+                    </div>
+                </main>
+            </div>
+
+            <!-- Two Factor Authentication Setup View -->
+            <div id="settings-2fa-view" class="sub-screen-view">
+                <header class="app-header">
+                    <button id="settings-2fa-back-btn" class="header-btn" aria-label="各種手続きへ戻る">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <span class="header-title">2段階認証設定</span>
+                    <div class="placeholder-icon"></div>
+                </header>
+
+                <main class="content-area scrollable">
+                    <!-- Status active UI -->
+                    <div id="two-factor-active-card" class="two-factor-status-card hidden">
+                        <i class="fa-solid fa-shield-halved active-shield-icon"></i>
+                        <h4>2段階認証は有効です</h4>
+                        <p id="two-factor-registered-phone" class="phone-display">登録携帯番号: 090-****-5678</p>
+                        <p class="status-desc">※ログインや重要なお手続きの際、この携帯電話番号宛てに届くSMS認証コードの入力が必要になります。</p>
+                        <button id="disable-2fa-btn" class="btn danger-btn btn-full margin-top-btn">2段階認証を解除する</button>
+                    </div>
+
+                    <!-- Setup form UI -->
+                    <div id="two-factor-setup-form-container">
+                        <div class="intro-alert">
+                            <i class="fa-solid fa-circle-info"></i>
+                            <p>携帯電話番号を登録し、SMSで届く6桁のコードを照合することで2段階認証を有効化できます。</p>
+                        </div>
+
+                        <h3>携帯電話番号の入力</h3>
+                        <form id="two-factor-setup-form" class="form-container">
+                            <div class="form-group inline-group">
+                                <div class="input-col">
+                                    <input type="tel" id="two-factor-phone" placeholder="例: 090-1234-5678" required pattern="[\d\-]+">
+                                </div>
+                                <button type="button" id="send-2fa-code-btn" class="btn secondary-btn align-bottom-btn">コード送信</button>
+                            </div>
+
+                            <!-- Code verification section (hidden initially) -->
+                            <div id="two-factor-code-section" class="form-group hidden">
+                                <label for="two-factor-code">認証コード (6桁)</label>
+                                <input type="text" id="two-factor-code" placeholder="受信した6桁のコードを入力" maxlength="6" pattern="\d{6}">
+                                <p id="two-factor-timer-msg" class="timer-message">認証コードは3分間有効です。 (再送信可能まで: <span id="two-factor-timer-seconds">60</span>秒)</p>
+                                
+                                <button type="submit" id="enable-2fa-btn" class="btn primary-btn btn-full margin-top-btn">認証して有効化する</button>
+                            </div>
+
+                            <!-- Error message display -->
+                            <div id="two-factor-error-banner" class="error-banner hidden">
+                                <i class="fa-solid fa-circle-info"></i>
+                                <span id="two-factor-error-message"></span>
+                            </div>
+                        </form>
+                    </div>
+                </main>
+            </div>
+        </section>
+
+        <!-- PayPay Charge Screen -->
+        <div id="paypay-charge-screen" class="screen">
+            <header class="app-header">
+                <button id="paypay-charge-back-btn" class="header-btn" aria-label="戻る">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <span class="header-title">PayPayへ入金（チャージ）</span>
+                <div class="placeholder-icon"></div>
+            </header>
+            <main class="content-area scrollable">
+                <div class="form-container">
+                    <div class="card margin-bottom-lg" style="text-align: center;">
+                        <p style="color: #666; font-size: 14px;">現在のPayPay残高</p>
+                        <h2 id="charge-current-paypay-balance" style="color: #e50020; font-size: 32px; margin: 10px 0;">¥0</h2>
+                    </div>
+                    <div class="form-group">
+                        <label>入金（チャージ）する金額</label>
+                        <input type="number" id="paypay-charge-amount" class="input-field" placeholder="金額を入力 (円)" />
+                        <p id="paypay-charge-error" class="error-text hidden margin-top-sm"></p>
+                    </div>
+                    <button id="paypay-charge-submit-btn" class="btn primary-btn btn-full margin-top-md" style="background-color: #e50020;">チャージする</button>
+                </div>
+            </main>
+        </div>
+
+        <!-- PayPay Withdraw Screen -->
+        <div id="paypay-withdraw-screen" class="screen">
+            <header class="app-header">
+                <button id="paypay-withdraw-back-btn" class="header-btn" aria-label="戻る">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <span class="header-title">PayPayから出金</span>
+                <div class="placeholder-icon"></div>
+            </header>
+            <main class="content-area scrollable">
+                <div class="form-container">
+                    <div class="card margin-bottom-lg" style="text-align: center;">
+                        <p style="color: #666; font-size: 14px;">現在のPayPay残高</p>
+                        <h2 id="withdraw-current-paypay-balance" style="color: #e50020; font-size: 32px; margin: 10px 0;">¥0</h2>
+                    </div>
+                    <div class="form-group">
+                        <label>出金（銀行へ戻す）金額</label>
+                        <input type="number" id="paypay-withdraw-amount" class="input-field" placeholder="金額を入力 (円)" />
+                        <p id="paypay-withdraw-error" class="error-text hidden margin-top-sm"></p>
+                    </div>
+                    <button id="paypay-withdraw-submit-btn" class="btn primary-btn btn-full margin-top-md" style="background-color: #e50020;">出金する</button>
+                </div>
+            </main>
+        </div>
+
+        <!-- PayPay Send Screen -->
+        <div id="paypay-send-screen" class="screen">
+            <header class="app-header">
+                <button id="paypay-send-back-btn" class="header-btn" aria-label="戻る">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <span class="header-title">PayPayを送る</span>
+                <div class="placeholder-icon"></div>
+            </header>
+            <main class="content-area scrollable">
+                <div class="form-container">
+                    <div class="card margin-bottom-lg" style="text-align: center;">
+                        <p style="color: #666; font-size: 14px;">現在のPayPay残高</p>
+                        <h2 id="send-current-paypay-balance" style="color: #e50020; font-size: 32px; margin: 10px 0;">¥0</h2>
+                    </div>
+                    <div class="form-group">
+                        <label>送金先 (PayPay ID または 携帯電話番号)</label>
+                        <input type="text" id="paypay-send-receiver" class="input-field" placeholder="ID または 電話番号" />
+                    </div>
+                    <div class="form-group margin-top-md">
+                        <label>送金する金額</label>
+                        <input type="number" id="paypay-send-amount" class="input-field" placeholder="金額を入力 (円)" />
+                        <p id="paypay-send-error" class="error-text hidden margin-top-sm"></p>
+                    </div>
+                    <button id="paypay-send-submit-btn" class="btn primary-btn btn-full margin-top-md" style="background-color: #e50020;">送金する</button>
+                </div>
+            </main>
+        </div>
+
+        <!-- ==================== DYNAMIC OVERLAYS & MODALS ==================== -->
+        
+        <!-- SMS Simulator Modal Popup -->
+        <div id="sms-modal" class="modal-overlay hidden">
+            <div class="sms-dialog">
+                <div class="sms-header">
+                    <div class="sms-sender-info">
+                        <i class="fa-solid fa-message sms-envelope-icon"></i>
+                        <div>
+                            <span class="sms-sender">ダミー銀行 (2段階認証センター)</span>
+                            <span class="sms-time">たった今</span>
+                        </div>
+                    </div>
+                    <button id="close-sms-modal-btn" class="sms-close-btn" aria-label="閉じる">&times;</button>
+                </div>
+                <div class="sms-body">
+                    <p>ダミー銀行をご利用いただきありがとうございます。認証コードは以下になります。</p>
+                    <p class="sms-code-label">【認証コード】</p>
+                    <h2 id="sms-code-display" class="sms-code-value">582194</h2>
+                    <p class="sms-footer">※コードの有効期限は3分です。</p>
+                </div>
+                <button id="close-sms-modal-bottom-btn" class="btn primary-btn btn-full sms-action-btn">コードを確認して閉じる</button>
+            </div>
+        </div>
+
+        <!-- Success Animation Overlay -->
+        <div id="success-overlay" class="modal-overlay success-overlay hidden">
+            <div class="success-card animate-zoom-in">
+                <div class="success-icon-wrapper">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <h3 id="success-overlay-title">手続き完了しました</h3>
+                <p id="success-overlay-message">詳細なメッセージが表示されます。</p>
+            </div>
+        </div>
+
+        <!-- Transfer 2FA Verification Modal -->
+        <div id="transfer-2fa-modal" class="modal-overlay hidden">
+            <div class="confirm-card animate-zoom-in">
+                <h3>2段階認証</h3>
+                <p class="modal-instruction">ご登録の携帯電話番号へ送信された6桁の認証コードを入力してください。</p>
+                <div class="form-group margin-top-md">
+                    <input type="text" id="transfer-2fa-code" class="text-input text-center" placeholder="6桁の数字" maxlength="6" style="font-size: 24px; letter-spacing: 4px; font-weight: bold;">
+                </div>
+                <div id="transfer-2fa-error-banner" class="error-banner hidden margin-bottom-md" style="margin-top: 10px;">
+                    <i class="fa-solid fa-circle-exclamation error-icon"></i>
+                    <span id="transfer-2fa-error-message">認証コードが一致しません。</span>
+                </div>
+                <div class="confirm-btn-row margin-top-lg">
+                    <button id="transfer-2fa-cancel-btn" class="btn secondary-btn">キャンセル</button>
+                    <button id="transfer-2fa-submit-btn" class="btn primary-btn">認証して振込</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PayPay Link Modal -->
+        <div id="paypay-link-modal" class="modal-overlay hidden">
+            <div class="confirm-card animate-zoom-in" style="text-align: center;">
+                <h3 style="color: #e50020; font-weight: bold;"><i class="fa-solid fa-link"></i> PayPay 連携</h3>
+                <div id="paypay-link-prompt">
+                    <p class="modal-instruction margin-top-md">PayPay残高を取得・入出金するには、PayPayアカウントの連携が必要です。<br><br>今すぐ連携しますか？</p>
+                    <div class="confirm-btn-row margin-top-lg">
+                        <button id="cancel-paypay-link-btn" class="btn outline-btn">キャンセル</button>
+                        <button id="confirm-paypay-link-btn" class="btn primary-btn" style="background-color: #e50020;">連携する</button>
+                    </div>
+                </div>
+                <div id="paypay-link-loading" class="hidden margin-top-md margin-bottom-md">
+                    <i class="fa-solid fa-spinner fa-spin fa-2x" style="color: #e50020;"></i>
+                    <p class="margin-top-sm" style="color: #666;">PayPayと連携中...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- PayPay Unlink Modal -->
+        <div id="paypay-unlink-modal" class="modal-overlay hidden">
+            <div class="confirm-card animate-zoom-in" style="text-align: center;">
+                <h3 style="color: #e50020; font-weight: bold;"><i class="fa-solid fa-link-slash"></i> PayPay 連携解除</h3>
+                <div id="paypay-unlink-prompt">
+                    <p class="modal-instruction margin-top-md">PayPayアカウントの連携を解除しますか？</p>
+                    <div class="confirm-btn-row margin-top-lg">
+                        <button id="cancel-paypay-unlink-btn" class="btn outline-btn" onclick="document.getElementById('paypay-unlink-modal').classList.add('hidden')">キャンセル</button>
+                        <button id="confirm-paypay-unlink-btn" class="btn primary-btn" style="background-color: #e50020;">解除する</button>
+                    </div>
+                </div>
+                <div id="paypay-unlink-loading" class="hidden margin-top-md margin-bottom-md">
+                    <i class="fa-solid fa-spinner fa-spin fa-2x" style="color: #e50020;"></i>
+                    <p class="margin-top-sm" style="color: #666;">連携解除中...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- PayPay Balance Modal -->
+        <div id="paypay-balance-modal" class="modal-overlay hidden">
+            <div class="confirm-card animate-zoom-in" style="text-align: center;">
+                <h3 style="color: #e50020; font-weight: bold;"><i class="fa-solid fa-p"></i>ayPay 残高</h3>
+                <p class="modal-instruction margin-top-md">現在のPayPay残高</p>
+                <div class="margin-top-md margin-bottom-lg">
+                    <h2 id="paypay-balance-display" style="font-size: 36px; letter-spacing: 2px; color: #1f2937; font-weight: bold; margin: 10px 0;">¥0</h2>
+                </div>
+                <div class="confirm-btn-row">
+                    <button id="close-paypay-modal-btn" class="btn primary-btn btn-full" style="background-color: #e50020;">閉じる</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Floating Software Token Card -->
+        <div id="software-token-card" class="token-card hidden animate-zoom-in">
+            <div class="token-header">
+                <i class="fa-solid fa-key token-icon" style="color: #10b981; margin-right: 8px;"></i>
+                <span style="font-weight: bold; font-size: 13px; color: #a1a1aa;">ワンタイムパスワード</span>
+            </div>
+            <div class="token-body" style="text-align: center; margin-top: 10px;">
+                <h2 id="software-token-code" style="font-size: 28px; letter-spacing: 3px; color: #10b981; font-weight: bold; margin: 5px 0;">------</h2>
+                <p style="font-size: 11px; color: #71717a; margin: 0;">モバイル端末での振込承認用コードです。</p>
+            </div>
+        </div>
+
+        <!-- Generic confirmation alerts -->
+        <div id="confirm-modal" class="modal-overlay hidden">
+            <div class="confirm-card animate-zoom-in">
+                <h3 id="confirm-modal-title">実行しますか？</h3>
+                <p id="confirm-modal-message">この操作は取り消せません。</p>
+                <div class="confirm-btn-row">
+                    <button id="confirm-cancel-btn" class="btn secondary-btn">キャンセル</button>
+                    <button id="confirm-ok-btn" class="btn danger-btn">実行する</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('SW registered:', reg))
+            .catch(err => console.error('SW registration failed:', err));
+        });
+      }
+    </script>
+</body>
+</html>
