@@ -1219,18 +1219,7 @@ setInterval(async () => {
         const oldStateStr = JSON.stringify(state.accounts);
         await fetchStateFromServer();
 
-        // Handle Floating Software Token Display
-        const acc = state.accounts[state.currentUser];
-        const tokenCard = document.getElementById("software-token-card");
-        const tokenCode = document.getElementById("software-token-code");
-        const transfer2FaModal = document.getElementById("transfer-2fa-modal");
 
-        if (acc && acc.pending2FACode && transfer2FaModal.classList.contains("hidden")) {
-            tokenCode.innerText = acc.pending2FACode;
-            tokenCard.classList.remove("hidden");
-        } else {
-            if (tokenCard) tokenCard.classList.add("hidden");
-        }
 
         const newStateStr = JSON.stringify(state.accounts);
 
