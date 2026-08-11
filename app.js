@@ -85,7 +85,7 @@ const state = {
 };
 
 // --- SYNC API HELPERS ---
-const API_URL = "http://localhost:8080/api/state";
+const API_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.protocol === "file:" ? "http://localhost:8080/api/state" : "/api/state";
 let isPushingState = false;
 
 async function fetchStateFromServer() {
@@ -458,8 +458,6 @@ document.getElementById("paypay-charge-submit-btn").addEventListener("click", as
         const acc = state.accounts[state.currentUser];
         acc.balance -= amount;
         acc.paypayBalance = (acc.paypayBalance || 0) + amount;
-        await pushStateToServer();
-        
         acc.transactions.unshift({
             id: `txn-${Date.now()}`,
             date: new Date().toISOString().split("T")[0],
@@ -467,6 +465,8 @@ document.getElementById("paypay-charge-submit-btn").addEventListener("click", as
             amount: amount,
             type: "withdrawal"
         });
+        
+        await pushStateToServer();
         
         showScreen("dashboard");
         showSuccessOverlay("チャージ完了", `${formatCurrency(amount)} をPayPayにチャージしました。`);
@@ -499,15 +499,15 @@ document.getElementById("paypay-withdraw-submit-btn").addEventListener("click", 
         const acc = state.accounts[state.currentUser];
         acc.balance += amount;
         acc.paypayBalance -= amount;
-        await pushStateToServer();
-        
         acc.transactions.unshift({
             id: `txn-${Date.now()}`,
             date: new Date().toISOString().split("T")[0],
             description: "PayPay出金",
             amount: amount,
-            type: "DEPOSIT"
+            type: "deposit"
         });
+        
+        await pushStateToServer();
         
         showScreen("dashboard");
         showSuccessOverlay("出金完了", `${formatCurrency(amount)} を銀行口座へ出金しました。`);
@@ -547,8 +547,6 @@ document.getElementById("paypay-send-submit-btn").addEventListener("click", asyn
         
         const acc = state.accounts[state.currentUser];
         acc.paypayBalance -= amount;
-        await pushStateToServer();
-        
         acc.transactions.unshift({
             id: `txn-${Date.now()}`,
             date: new Date().toISOString().split("T")[0],
@@ -556,6 +554,8 @@ document.getElementById("paypay-send-submit-btn").addEventListener("click", asyn
             amount: amount,
             type: "withdrawal"
         });
+        
+        await pushStateToServer();
         
         showScreen("dashboard");
         showSuccessOverlay("送金完了", `${formatCurrency(amount)} を送金しました。`);
