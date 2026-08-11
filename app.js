@@ -85,7 +85,7 @@ const state = {
 };
 
 // --- SYNC API HELPERS ---
-const API_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.protocol === "file:" ? "http://localhost:8080/api/state" : "/api/state";
+const API_URL = "https://YOUR_PROJECT_ID.firebaseio.com/state.json";
 let isPushingState = false;
 
 async function fetchStateFromServer() {
@@ -132,7 +132,7 @@ async function pushStateToServer() {
     
     try {
         await fetch(API_URL, {
-            method: "POST",
+            method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(state.accounts)
         });
