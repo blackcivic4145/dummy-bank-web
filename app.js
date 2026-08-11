@@ -1133,7 +1133,7 @@ function updateTwoFactorSetupView() {
     const setupForm = document.getElementById("two-factor-setup-form-container");
 
     // Reset values
-    document.getElementById("two-factor-email").value = "";
+    document.getElementById("two-factor-email-input").value = "";
     document.getElementById("two-factor-code").value = "";
     document.getElementById("two-factor-code-section").classList.add("hidden");
     document.getElementById("two-factor-error-banner").classList.add("hidden");
@@ -1211,7 +1211,7 @@ document.getElementById("send-2fa-code-btn").addEventListener("click", () => {
 document.getElementById("two-factor-setup-form").addEventListener("submit", async (e) => {
     e.preventDefault();
     const codeInput = document.getElementById("two-factor-code").value.trim();
-    const phoneInput = document.getElementById("two-factor-email").value.trim();
+    const phoneInput = document.getElementById("two-factor-email-input").value.trim();
     const errorBanner = document.getElementById("two-factor-error-banner");
     const errorMsg = document.getElementById("two-factor-error-message");
 
