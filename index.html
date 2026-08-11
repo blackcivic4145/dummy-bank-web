@@ -385,10 +385,10 @@
                         <div id="settings-2fa-item" class="settings-item-card clickable-row">
                             <div class="settings-row-left">
                                 <div class="settings-icon-box">
-                                    <i class="fa-solid fa-comment-sms"></i>
+                                    <i class="fa-solid fa-envelope"></i>
                                 </div>
                                 <div class="settings-row-meta">
-                                    <span class="row-title">2段階認証 (SMS認証)</span>
+                                    <span class="row-title">2段階認証 (メール認証)</span>
                                     <span id="settings-2fa-status" class="row-status">未設定</span>
                                 </div>
                             </div>
@@ -469,8 +469,8 @@
                     <div id="two-factor-active-card" class="two-factor-status-card hidden">
                         <i class="fa-solid fa-shield-halved active-shield-icon"></i>
                         <h4>2段階認証は有効です</h4>
-                        <p id="two-factor-registered-phone" class="phone-display">登録携帯番号: 090-****-5678</p>
-                        <p class="status-desc">※ログインや重要なお手続きの際、この携帯電話番号宛てに届くSMS認証コードの入力が必要になります。</p>
+                        <p id="two-factor-registered-phone" class="phone-display">登録メールアドレス: 090-****-5678</p>
+                        <p class="status-desc">※ログインや重要なお手続きの際、このメールアドレス宛てに届くメール認証コードの入力が必要になります。</p>
                         <button id="disable-2fa-btn" class="btn danger-btn btn-full margin-top-btn">2段階認証を解除する</button>
                     </div>
 
@@ -478,14 +478,14 @@
                     <div id="two-factor-setup-form-container">
                         <div class="intro-alert">
                             <i class="fa-solid fa-circle-info"></i>
-                            <p>携帯電話番号を登録し、SMSで届く6桁のコードを照合することで2段階認証を有効化できます。</p>
+                            <p>メールアドレスを登録し、メールで届く6桁のコードを照合することで2段階認証を有効化できます。</p>
                         </div>
 
-                        <h3>携帯電話番号の入力</h3>
+                        <h3>メールアドレスの入力</h3>
                         <form id="two-factor-setup-form" class="form-container">
                             <div class="form-group inline-group">
                                 <div class="input-col">
-                                    <input type="tel" id="two-factor-phone" placeholder="例: 090-1234-5678" required pattern="[\d\-]+">
+                                    <input type="email" id="two-factor-phone" placeholder="例: 090-1234-5678" required pattern="[\d\-]+">
                                 </div>
                                 <button type="button" id="send-2fa-code-btn" class="btn secondary-btn align-bottom-btn">コード送信</button>
                             </div>
@@ -576,7 +576,7 @@
                         <h2 id="send-current-paypay-balance" style="color: #e50020; font-size: 32px; margin: 10px 0;">¥0</h2>
                     </div>
                     <div class="form-group">
-                        <label>送金先 (PayPay ID または 携帯電話番号)</label>
+                        <label>送金先 (PayPay ID または メールアドレス)</label>
                         <input type="text" id="paypay-send-receiver" class="input-field" placeholder="ID または 電話番号" />
                     </div>
                     <div class="form-group margin-top-md">
@@ -591,7 +591,7 @@
 
         <!-- ==================== DYNAMIC OVERLAYS & MODALS ==================== -->
         
-        <!-- SMS Simulator Modal Popup -->
+        <!-- メール Simulator Modal Popup -->
         <div id="sms-modal" class="modal-overlay hidden">
             <div class="sms-dialog">
                 <div class="sms-header">
@@ -629,7 +629,7 @@
         <div id="transfer-2fa-modal" class="modal-overlay hidden">
             <div class="confirm-card animate-zoom-in">
                 <h3>2段階認証</h3>
-                <p class="modal-instruction">ご登録の携帯電話番号へ送信された6桁の認証コードを入力してください。</p>
+                <p class="modal-instruction">ご登録のメールアドレスへ送信された6桁の認証コードを入力してください。</p>
                 <div class="form-group margin-top-md">
                     <input type="text" id="transfer-2fa-code" class="text-input text-center" placeholder="6桁の数字" maxlength="6" style="font-size: 24px; letter-spacing: 4px; font-weight: bold;">
                 </div>

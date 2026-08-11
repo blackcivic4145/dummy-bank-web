@@ -41,7 +41,7 @@ const state = {
                     maturityInstruction: "AUTO_CANCEL"
                 }
             ],
-            twoFactorPhoneNumber: null,
+            twoFactorEmail: null,
             isTwoFactorEnabled: false,
             pending2FACode: null
         },
@@ -66,7 +66,7 @@ const state = {
                     maturityInstruction: "AUTO_CANCEL"
                 }
             ],
-            twoFactorPhoneNumber: null,
+            twoFactorEmail: null,
             isTwoFactorEnabled: false,
             pending2FACode: null
         }
@@ -148,14 +148,15 @@ function formatDate(dateStr) {
     return dateStr.replace(/-/g, "/");
 }
 
-function maskPhone(phone) {
-    const clean = phone.replace(/-/g, "");
-    if (clean.length === 11) {
-        return `${clean.substring(0, 3)}-****-${clean.substring(7)}`;
-    } else if (clean.length === 10) {
-        return `${clean.substring(0, 3)}-***-${clean.substring(6)}`;
+function maskEmail(email) {
+    if (!email || !email.includes("@")) return email;
+    const parts = email.split("@");
+    const name = parts[0];
+    const domain = parts[1];
+    if (name.length <= 2) {
+        return `${name[0]}***@${domain}`;
     }
-    return phone;
+    return `${name.substring(0, 2)}***${name.substring(name.length - 1)}@${domain}`;
 }
 
 // 4. ROUTING & UI LIFECYCLE
@@ -1095,8 +1096,8 @@ function updateSettingsPortalView() {
     const acc = state.accounts[state.currentUser];
     const statusText = document.getElementById("settings-2fa-status");
     
-    if (acc.isTwoFactorEnabled && acc.twoFactorPhoneNumber) {
-        statusText.innerText = `設定済 (${maskPhone(acc.twoFactorPhoneNumber)})`;
+    if (acc.isTwoFactorEnabled && acc.twoFactorEmail) {
+        statusText.innerText = `設定済 (${maskEmail(acc.twoFactorEmail)})`;
         statusText.classList.add("active-status");
     } else {
         statusText.innerText = "未設定";
@@ -1132,7 +1133,7 @@ function updateTwoFactorSetupView() {
     const setupForm = document.getElementById("two-factor-setup-form-container");
 
     // Reset values
-    document.getElementById("two-factor-phone").value = "";
+    document.getElementById("two-factor-email").value = "";
     document.getElementById("two-factor-code").value = "";
     document.getElementById("two-factor-code-section").classList.add("hidden");
     document.getElementById("two-factor-error-banner").classList.add("hidden");
@@ -1142,27 +1143,26 @@ function updateTwoFactorSetupView() {
     state.timerSeconds = 0;
     if (state.timerInterval) clearInterval(state.timerInterval);
 
-    if (acc.isTwoFactorEnabled && acc.twoFactorPhoneNumber) {
+    if (acc.isTwoFactorEnabled && acc.twoFactorEmail) {
         activeCard.classList.remove("hidden");
         setupForm.classList.add("hidden");
-        document.getElementById("two-factor-registered-phone").innerText = `登録携帯番号: ${maskPhone(acc.twoFactorPhoneNumber)}`;
+        document.getElementById("two-factor-registered-phone").innerText = `登録メールアドレス: ${maskEmail(acc.twoFactorEmail)}`;
     } else {
         activeCard.classList.add("hidden");
         setupForm.classList.remove("hidden");
     }
 }
 
-// 2FA SMS Code dispatch simulator
+// 2FA Email Code dispatch simulator
 document.getElementById("send-2fa-code-btn").addEventListener("click", () => {
-    const phone = document.getElementById("two-factor-phone").value.trim();
-    const cleanPhone = phone.replace(/-/g, "");
+    const email = document.getElementById("two-factor-email-input").value.trim();
     const errorBanner = document.getElementById("two-factor-error-banner");
     const errorMsg = document.getElementById("two-factor-error-message");
 
     errorBanner.classList.add("hidden");
 
-    if (cleanPhone.length < 10 || cleanPhone.length > 11 || isNaN(cleanPhone)) {
-        errorMsg.innerText = "正しい携帯電話番号を入力してください。";
+    if (!email || !email.includes("@")) {
+        errorMsg.innerText = "正しいメールアドレスを入力してください。";
         errorBanner.classList.remove("hidden");
         return;
     }
@@ -1172,8 +1172,8 @@ document.getElementById("send-2fa-code-btn").addEventListener("click", () => {
     state.generatedCode = code;
 
     // Simulate SMS dispatch dialog
-    document.getElementById("sms-code-display").innerText = code;
-    document.getElementById("sms-modal").classList.remove("hidden");
+    document.getElementById("email-code-display").innerText = code;
+    document.getElementById("email-modal").classList.remove("hidden");
 
     // Setup input code section
     document.getElementById("two-factor-code-section").classList.remove("hidden");
@@ -1198,14 +1198,14 @@ document.getElementById("send-2fa-code-btn").addEventListener("click", () => {
 });
 
 // Close SMS modal
-document.getElementById("close-sms-modal-btn").onclick = () => document.getElementById("sms-modal").classList.add("hidden");
-document.getElementById("close-sms-modal-bottom-btn").onclick = () => document.getElementById("sms-modal").classList.add("hidden");
+document.getElementById("close-email-modal-btn").onclick = () => document.getElementById("email-modal").classList.add("hidden");
+document.getElementById("close-email-modal-bottom-btn").onclick = () => document.getElementById("email-modal").classList.add("hidden");
 
 // Submit verification code
 document.getElementById("two-factor-setup-form").addEventListener("submit", async (e) => {
     e.preventDefault();
     const codeInput = document.getElementById("two-factor-code").value.trim();
-    const phoneInput = document.getElementById("two-factor-phone").value.trim();
+    const phoneInput = document.getElementById("two-factor-email").value.trim();
     const errorBanner = document.getElementById("two-factor-error-banner");
     const errorMsg = document.getElementById("two-factor-error-message");
 
@@ -1220,7 +1220,7 @@ document.getElementById("two-factor-setup-form").addEventListener("submit", asyn
     // Enable 2FA
     const acc = state.accounts[state.currentUser];
     acc.isTwoFactorEnabled = true;
-    acc.twoFactorPhoneNumber = phoneInput;
+    acc.twoFactorEmail = phoneInput;
 
     await pushStateToServer();
     showSuccessOverlay("2段階認証完了", "2段階認証（SMS）を設定しました。");
@@ -1238,7 +1238,7 @@ document.getElementById("disable-2fa-btn").addEventListener("click", () => {
         async () => {
             const acc = state.accounts[state.currentUser];
             acc.isTwoFactorEnabled = false;
-            acc.twoFactorPhoneNumber = null;
+            acc.twoFactorEmail = null;
 
             await pushStateToServer();
             showSuccessOverlay("解除完了", "2段階認証設定を解除しました。");
