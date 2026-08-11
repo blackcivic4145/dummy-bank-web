@@ -1231,7 +1231,7 @@ select:disabled {
 }
 
 /* SMS Simulator Popup Card */
-.sms-dialog {
+.email-dialog {
     width: 100%;
     background-color: #1e1e24;
     border: 1.5px solid #2e2e38;
@@ -1242,11 +1242,11 @@ select:disabled {
     transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.modal-overlay:not(.hidden) .sms-dialog {
+.modal-overlay:not(.hidden) .email-dialog {
     transform: translateY(0);
 }
 
-.sms-header {
+.email-header {
     padding: 14px 18px;
     background-color: #16161c;
     border-bottom: 1px solid #2e2e38;
@@ -1255,30 +1255,30 @@ select:disabled {
     align-items: center;
 }
 
-.sms-sender-info {
+.email-sender-info {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-.sms-envelope-icon {
+.email-envelope-icon {
     font-size: 16px;
     color: var(--color-primary);
 }
 
-.sms-sender {
+.email-sender {
     font-size: 12px;
     font-weight: 700;
     display: block;
     color: #e2e8f0;
 }
 
-.sms-time {
+.email-time {
     font-size: 9px;
     color: var(--color-text-muted);
 }
 
-.sms-close-btn {
+.email-close-btn {
     background: none;
     border: none;
     color: var(--color-text-secondary);
@@ -1287,24 +1287,24 @@ select:disabled {
     padding: 4px;
 }
 
-.sms-body {
+.email-body {
     padding: 20px 24px;
     text-align: center;
 }
 
-.sms-body p {
+.email-body p {
     font-size: 13px;
     color: #cbd5e1;
 }
 
-.sms-code-label {
+.email-code-label {
     margin-top: 14px;
     font-size: 11px !important;
     font-weight: 700;
     color: var(--color-text-secondary);
 }
 
-.sms-code-value {
+.email-code-value {
     font-family: var(--font-heading);
     font-size: 32px;
     font-weight: 800;
@@ -1313,12 +1313,12 @@ select:disabled {
     margin: 6px 0 14px;
 }
 
-.sms-footer {
+.email-footer {
     font-size: 10px !important;
     color: var(--color-text-muted);
 }
 
-.sms-action-btn {
+.email-action-btn {
     border-radius: 0;
     height: 52px;
 }

@@ -1171,7 +1171,7 @@ document.getElementById("send-2fa-code-btn").addEventListener("click", () => {
     const code = Math.floor(100000 + Math.random() * 900000).toString();
     state.generatedCode = code;
 
-    // Simulate SMS dispatch dialog
+    // Simulate メール dispatch dialog
     document.getElementById("email-code-display").innerText = code;
     document.getElementById("email-modal").classList.remove("hidden");
 
@@ -1197,7 +1197,7 @@ document.getElementById("send-2fa-code-btn").addEventListener("click", () => {
     }, 1000);
 });
 
-// Close SMS modal
+// Close メール modal
 document.getElementById("close-email-modal-btn").onclick = () => document.getElementById("email-modal").classList.add("hidden");
 document.getElementById("close-email-modal-bottom-btn").onclick = () => document.getElementById("email-modal").classList.add("hidden");
 
@@ -1223,7 +1223,7 @@ document.getElementById("two-factor-setup-form").addEventListener("submit", asyn
     acc.twoFactorEmail = phoneInput;
 
     await pushStateToServer();
-    showSuccessOverlay("2段階認証完了", "2段階認証（SMS）を設定しました。");
+    showSuccessOverlay("2段階認証完了", "2段階認証（メール）を設定しました。");
     
     setTimeout(() => {
         showScreen("settings");

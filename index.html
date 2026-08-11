@@ -592,25 +592,25 @@
         <!-- ==================== DYNAMIC OVERLAYS & MODALS ==================== -->
         
         <!-- メール Simulator Modal Popup -->
-        <div id="sms-modal" class="modal-overlay hidden">
-            <div class="sms-dialog">
-                <div class="sms-header">
-                    <div class="sms-sender-info">
-                        <i class="fa-solid fa-message sms-envelope-icon"></i>
+        <div id="email-modal" class="modal-overlay hidden">
+            <div class="email-dialog">
+                <div class="email-header">
+                    <div class="email-sender-info">
+                        <i class="fa-solid fa-message email-envelope-icon"></i>
                         <div>
-                            <span class="sms-sender">ダミー銀行 (2段階認証センター)</span>
-                            <span class="sms-time">たった今</span>
+                            <span class="email-sender">ダミー銀行 (2段階認証センター)</span>
+                            <span class="email-time">たった今</span>
                         </div>
                     </div>
-                    <button id="close-sms-modal-btn" class="sms-close-btn" aria-label="閉じる">&times;</button>
+                    <button id="close-email-modal-btn" class="email-close-btn" aria-label="閉じる">&times;</button>
                 </div>
-                <div class="sms-body">
+                <div class="email-body">
                     <p>ダミー銀行をご利用いただきありがとうございます。認証コードは以下になります。</p>
-                    <p class="sms-code-label">【認証コード】</p>
-                    <h2 id="sms-code-display" class="sms-code-value">582194</h2>
-                    <p class="sms-footer">※コードの有効期限は3分です。</p>
+                    <p class="email-code-label">【認証コード】</p>
+                    <h2 id="email-code-display" class="email-code-value">582194</h2>
+                    <p class="email-footer">※コードの有効期限は3分です。</p>
                 </div>
-                <button id="close-sms-modal-bottom-btn" class="btn primary-btn btn-full sms-action-btn">コードを確認して閉じる</button>
+                <button id="close-email-modal-bottom-btn" class="btn primary-btn btn-full email-action-btn">コードを確認して閉じる</button>
             </div>
         </div>
 
