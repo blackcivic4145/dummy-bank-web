@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dummybank-cache-v1';
+const CACHE_NAME = 'dummybank-cache-v2';
 const urlsToCache = [
   './index.html',
   './style.css',
@@ -9,29 +9,42 @@ const urlsToCache = [
 ];
 
 self.addEventListener('install', event => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        // try to cache, but don't fail installation if some fail
         return Promise.allSettled(urlsToCache.map(url => cache.add(url)));
       })
   );
 });
 
-self.addEventListener('fetch', event => {
-  // Only intercept GET requests
-  if (event.request.method !== 'GET') return;
+self.addEventListener('activate', event => {
+  event.waitUntil(self.clients.claim());
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+});
 
+self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') return;
+  
   event.respondWith(
-    caches.match(event.request)
+    fetch(event.request)
       .then(response => {
-        if (response) {
-          return response;
-        }
-        return fetch(event.request).catch(() => {
-          // Fallback if offline
-          console.warn('Network request failed and no cache available for', event.request.url);
+        const responseToCache = response.clone();
+        caches.open(CACHE_NAME).then(cache => {
+          cache.put(event.request, responseToCache);
         });
+        return response;
       })
+      .catch(() => caches.match(event.request))
   );
 });
