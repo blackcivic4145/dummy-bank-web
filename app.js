@@ -692,50 +692,8 @@ document.getElementById("transfer-form").addEventListener("submit", async (e) =>
         return;
     }
 
-    // 常に2段階認証を必須とする
-    // Generate random verification code
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    state.generatedCode = code;
-
-    // Save code to database and push to server so Mobile can read it
-    sender.pending2FACode = code;
-    await pushStateToServer();
-
-    // Show Transfer 2FA modal with instructions
-    document.querySelector("#transfer-2fa-modal .modal-instruction").innerText = 
-        "モバイル端末のアプリ画面（マイページ等）に表示された6桁の認証コードを入力してください。";
-    const codeInput = document.getElementById("transfer-2fa-code");
-    codeInput.value = "";
-    document.getElementById("transfer-2fa-error-banner").classList.add("hidden");
-    document.getElementById("transfer-2fa-modal").classList.remove("hidden");
-
-    const cancelBtn = document.getElementById("transfer-2fa-cancel-btn");
-    const submitBtn = document.getElementById("transfer-2fa-submit-btn");
-
-    const cleanup = async () => {
-        document.getElementById("transfer-2fa-modal").classList.add("hidden");
-        cancelBtn.onclick = null;
-        submitBtn.onclick = null;
-        // Clear pending code on server
-        sender.pending2FACode = null;
-        await pushStateToServer();
-    };
-
-    cancelBtn.onclick = () => cleanup();
-    submitBtn.onclick = async () => {
-        if (codeInput.value.trim() === state.generatedCode) {
-            // Clear code
-            sender.pending2FACode = null;
-            // Cleanup modal
-            document.getElementById("transfer-2fa-modal").classList.add("hidden");
-            cancelBtn.onclick = null;
-            submitBtn.onclick = null;
-            // Execute actual transfer
-            await executeTransfer(sender, receiver, amount);
-        } else {
-            document.getElementById("transfer-2fa-error-banner").classList.remove("hidden");
-        }
-    };
+    // Execute actual transfer
+    await executeTransfer(sender, receiver, amount);
 });
 
 // ==================== 4. SAVINGS SCREEN LOGIC ====================
