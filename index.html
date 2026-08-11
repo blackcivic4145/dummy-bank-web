@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DummyBankSystem | プレミアムオンラインバンキング</title>
-    <meta name="description" content="セキュアでモダンなグラスモフィズムデザインのダミー銀行システムシミュレータ。送金、定期預金、積立、2段階認証をサポート。">
+    <meta name="description" content="セキュアでモダンなグラスモフィズムデザインのダミー銀行システムシミュレータ。送金、定期預金、積立をサポート。">
     <!-- PWA / iOS Meta Tags -->
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -381,20 +381,6 @@
 
                 <main class="content-area scrollable">
                     <h3>セキュリティ設定</h3>
-                    <div class="settings-list">
-                        <div id="settings-2fa-item" class="settings-item-card clickable-row">
-                            <div class="settings-row-left">
-                                <div class="settings-icon-box">
-                                    <i class="fa-solid fa-envelope"></i>
-                                </div>
-                                <div class="settings-row-meta">
-                                    <span class="row-title">2段階認証 (メール認証)</span>
-                                    <span id="settings-2fa-status" class="row-status">未設定</span>
-                                </div>
-                            </div>
-                            <i class="fa-solid fa-chevron-right chevron-icon"></i>
-                        </div>
-                    </div>
 
                     <h3 class="margin-top-h3">外部連携サービス</h3>
                     <div class="settings-list">
@@ -454,60 +440,7 @@
                 </main>
             </div>
 
-            <!-- Two Factor Authentication Setup View -->
-            <div id="settings-2fa-view" class="sub-screen-view">
-                <header class="app-header">
-                    <button id="settings-2fa-back-btn" class="header-btn" aria-label="各種手続きへ戻る">
-                        <i class="fa-solid fa-chevron-left"></i>
-                    </button>
-                    <span class="header-title">2段階認証設定</span>
-                    <div class="placeholder-icon"></div>
-                </header>
 
-                <main class="content-area scrollable">
-                    <!-- Status active UI -->
-                    <div id="two-factor-active-card" class="two-factor-status-card hidden">
-                        <i class="fa-solid fa-shield-halved active-shield-icon"></i>
-                        <h4>2段階認証は有効です</h4>
-                        <p id="two-factor-registered-phone" class="phone-display">登録メールアドレス: 090-****-5678</p>
-                        <p class="status-desc">※ログインや重要なお手続きの際、このメールアドレス宛てに届くメール認証コードの入力が必要になります。</p>
-                        <button id="disable-2fa-btn" class="btn danger-btn btn-full margin-top-btn">2段階認証を解除する</button>
-                    </div>
-
-                    <!-- Setup form UI -->
-                    <div id="two-factor-setup-form-container">
-                        <div class="intro-alert">
-                            <i class="fa-solid fa-circle-info"></i>
-                            <p>メールアドレスを登録し、メールで届く6桁のコードを照合することで2段階認証を有効化できます。</p>
-                        </div>
-
-                        <h3>メールアドレスの入力</h3>
-                        <form id="two-factor-setup-form" class="form-container">
-                            <div class="form-group inline-group">
-                                <div class="input-col">
-                                    <input type="email" id="two-factor-email-input" placeholder="例: test@example.com" required>
-                                </div>
-                                <button type="button" id="send-2fa-code-btn" class="btn secondary-btn align-bottom-btn">コード送信</button>
-                            </div>
-
-                            <!-- Code verification section (hidden initially) -->
-                            <div id="two-factor-code-section" class="form-group hidden">
-                                <label for="two-factor-code">認証コード (6桁)</label>
-                                <input type="text" id="two-factor-code" placeholder="受信した6桁のコードを入力" maxlength="6" pattern="\d{6}">
-                                <p id="two-factor-timer-msg" class="timer-message">認証コードは3分間有効です。 (再送信可能まで: <span id="two-factor-timer-seconds">60</span>秒)</p>
-                                
-                                <button type="submit" id="enable-2fa-btn" class="btn primary-btn btn-full margin-top-btn">認証して有効化する</button>
-                            </div>
-
-                            <!-- Error message display -->
-                            <div id="two-factor-error-banner" class="error-banner hidden">
-                                <i class="fa-solid fa-circle-info"></i>
-                                <span id="two-factor-error-message"></span>
-                            </div>
-                        </form>
-                    </div>
-                </main>
-            </div>
         </section>
 
         <!-- PayPay Charge Screen -->
@@ -603,24 +536,6 @@
             </div>
         </div>
 
-        <!-- Transfer 2FA Verification Modal -->
-        <div id="transfer-2fa-modal" class="modal-overlay hidden">
-            <div class="confirm-card animate-zoom-in">
-                <h3>2段階認証</h3>
-                <p class="modal-instruction">ご登録のメールアドレスへ送信された6桁の認証コードを入力してください。</p>
-                <div class="form-group margin-top-md">
-                    <input type="text" id="transfer-2fa-code" class="text-input text-center" placeholder="6桁の数字" maxlength="6" style="font-size: 24px; letter-spacing: 4px; font-weight: bold;">
-                </div>
-                <div id="transfer-2fa-error-banner" class="error-banner hidden margin-bottom-md" style="margin-top: 10px;">
-                    <i class="fa-solid fa-circle-exclamation error-icon"></i>
-                    <span id="transfer-2fa-error-message">認証コードが一致しません。</span>
-                </div>
-                <div class="confirm-btn-row margin-top-lg">
-                    <button id="transfer-2fa-cancel-btn" class="btn secondary-btn">キャンセル</button>
-                    <button id="transfer-2fa-submit-btn" class="btn primary-btn">認証して振込</button>
-                </div>
-            </div>
-        </div>
 
         <!-- PayPay Link Modal -->
         <div id="paypay-link-modal" class="modal-overlay hidden">

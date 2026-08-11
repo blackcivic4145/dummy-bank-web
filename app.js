@@ -82,6 +82,7 @@ const state = {
 
 // --- SYNC API HELPERS ---
 const API_URL = "http://localhost:8080/api/state";
+const API_BASE = "http://localhost:8080";
 let isPushingState = false;
 
 async function fetchStateFromServer() {
@@ -692,50 +693,8 @@ document.getElementById("transfer-form").addEventListener("submit", async (e) =>
         return;
     }
 
-    // 常に2段階認証を必須とする
-    // Generate random verification code
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    state.generatedCode = code;
-
-    // Save code to database and push to server so Mobile can read it
-    sender.pending2FACode = code;
-    await pushStateToServer();
-
-    // Show Transfer 2FA modal with instructions
-    document.querySelector("#transfer-2fa-modal .modal-instruction").innerText = 
-        "モバイル端末のアプリ画面（マイページ等）に表示された6桁の認証コードを入力してください。";
-    const codeInput = document.getElementById("transfer-2fa-code");
-    codeInput.value = "";
-    document.getElementById("transfer-2fa-error-banner").classList.add("hidden");
-    document.getElementById("transfer-2fa-modal").classList.remove("hidden");
-
-    const cancelBtn = document.getElementById("transfer-2fa-cancel-btn");
-    const submitBtn = document.getElementById("transfer-2fa-submit-btn");
-
-    const cleanup = async () => {
-        document.getElementById("transfer-2fa-modal").classList.add("hidden");
-        cancelBtn.onclick = null;
-        submitBtn.onclick = null;
-        // Clear pending code on server
-        sender.pending2FACode = null;
-        await pushStateToServer();
-    };
-
-    cancelBtn.onclick = () => cleanup();
-    submitBtn.onclick = async () => {
-        if (codeInput.value.trim() === state.generatedCode) {
-            // Clear code
-            sender.pending2FACode = null;
-            // Cleanup modal
-            document.getElementById("transfer-2fa-modal").classList.add("hidden");
-            cancelBtn.onclick = null;
-            submitBtn.onclick = null;
-            // Execute actual transfer
-            await executeTransfer(sender, receiver, amount);
-        } else {
-            document.getElementById("transfer-2fa-error-banner").classList.remove("hidden");
-        }
-    };
+    // Execute actual transfer
+    await executeTransfer(sender, receiver, amount);
 });
 
 // ==================== 4. SAVINGS SCREEN LOGIC ====================
@@ -1094,16 +1053,6 @@ function showSubView(viewId) {
 
 function updateSettingsPortalView() {
     const acc = state.accounts[state.currentUser];
-    const statusText = document.getElementById("settings-2fa-status");
-    
-    if (acc.isTwoFactorEnabled && acc.twoFactorEmail) {
-        statusText.innerText = `設定済 (${maskEmail(acc.twoFactorEmail)})`;
-        statusText.classList.add("active-status");
-    } else {
-        statusText.innerText = "未設定";
-        statusText.classList.remove("active-status");
-    }
-    
     const paypayStatusText = document.getElementById("settings-paypay-status");
     if (paypayStatusText) {
         if (acc.isPayPayLinked) {
@@ -1116,144 +1065,7 @@ function updateSettingsPortalView() {
     }
 }
 
-// Wire settings portal click
-document.getElementById("settings-2fa-item").addEventListener("click", () => {
-    showSubView("settings-2fa-view");
-    updateTwoFactorSetupView();
-});
 
-document.getElementById("settings-2fa-back-btn").addEventListener("click", () => {
-    showSubView("settings-2fa-content");
-    showScreen("settings");
-});
-
-function updateTwoFactorSetupView() {
-    const acc = state.accounts[state.currentUser];
-    const activeCard = document.getElementById("two-factor-active-card");
-    const setupForm = document.getElementById("two-factor-setup-form-container");
-
-    // Reset values
-    document.getElementById("two-factor-email-input").value = "";
-    document.getElementById("two-factor-code").value = "";
-    document.getElementById("two-factor-code-section").classList.add("hidden");
-    document.getElementById("two-factor-error-banner").classList.add("hidden");
-    document.getElementById("send-2fa-code-btn").disabled = false;
-    document.getElementById("send-2fa-code-btn").innerText = "コード送信";
-    state.generatedCode = null;
-    state.timerSeconds = 0;
-    if (state.timerInterval) clearInterval(state.timerInterval);
-
-    if (acc.isTwoFactorEnabled && acc.twoFactorEmail) {
-        activeCard.classList.remove("hidden");
-        setupForm.classList.add("hidden");
-        document.getElementById("two-factor-registered-phone").innerText = `登録メールアドレス: ${maskEmail(acc.twoFactorEmail)}`;
-    } else {
-        activeCard.classList.add("hidden");
-        setupForm.classList.remove("hidden");
-    }
-}
-
-// 2FA Email Code dispatch simulator
-document.getElementById("send-2fa-code-btn").addEventListener("click", () => {
-    const email = document.getElementById("two-factor-email-input").value.trim();
-    const errorBanner = document.getElementById("two-factor-error-banner");
-    const errorMsg = document.getElementById("two-factor-error-message");
-
-    errorBanner.classList.add("hidden");
-
-    if (!email || !email.includes("@")) {
-        errorMsg.innerText = "正しいメールアドレスを入力してください。";
-        errorBanner.classList.remove("hidden");
-        return;
-    }
-
-    // Generate random code
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    state.generatedCode = code;
-
-    // Generate and download mock email file
-    const emailContent = `To: ${email}\nFrom: security@dummybank.com\nSubject: 【DummyBank】2段階認証コード\n\nあなたの認証コードは以下の通りです。\n[ ${code} ]\n\nこのコードの有効期限は3分です。`;
-    const blob = new Blob([emailContent], { type: "text/plain;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "email_from_dummybank.txt";
-    a.click();
-    URL.revokeObjectURL(url);
-
-    showSuccessOverlay("メール送信完了", "認証コードが記載されたファイルがダウンロードされました。ファイルを開き、記載されたコードを入力してください。");
-
-    // Setup input code section
-    document.getElementById("two-factor-code-section").classList.remove("hidden");
-    document.getElementById("two-factor-timer-seconds").innerText = "60";
-    
-    const sendBtn = document.getElementById("send-2fa-code-btn");
-    sendBtn.disabled = true;
-    state.timerSeconds = 60;
-    
-    if (state.timerInterval) clearInterval(state.timerInterval);
-    state.timerInterval = setInterval(() => {
-        state.timerSeconds--;
-        document.getElementById("two-factor-timer-seconds").innerText = state.timerSeconds;
-        sendBtn.innerText = `再送 (${state.timerSeconds}秒)`;
-        
-        if (state.timerSeconds <= 0) {
-            clearInterval(state.timerInterval);
-            sendBtn.disabled = false;
-            sendBtn.innerText = "再送信";
-        }
-    }, 1000);
-});
-
-
-
-// Submit verification code
-document.getElementById("two-factor-setup-form").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const codeInput = document.getElementById("two-factor-code").value.trim();
-    const phoneInput = document.getElementById("two-factor-email-input").value.trim();
-    const errorBanner = document.getElementById("two-factor-error-banner");
-    const errorMsg = document.getElementById("two-factor-error-message");
-
-    errorBanner.classList.add("hidden");
-
-    if (codeInput !== state.generatedCode) {
-        errorMsg.innerText = "認証コードが一致しません。正しいコードを入力してください。";
-        errorBanner.classList.remove("hidden");
-        return;
-    }
-
-    // Enable 2FA
-    const acc = state.accounts[state.currentUser];
-    acc.isTwoFactorEnabled = true;
-    acc.twoFactorEmail = phoneInput;
-
-    await pushStateToServer();
-    showSuccessOverlay("2段階認証完了", "2段階認証（メール）を設定しました。");
-    
-    setTimeout(() => {
-        showScreen("settings");
-    }, 2200);
-});
-
-// Disable 2FA
-document.getElementById("disable-2fa-btn").addEventListener("click", () => {
-    showConfirmModal(
-        "2段階認証の解除",
-        "本当に2段階認証を解除しますか？解除するとアカウントのセキュリティ強度が低下します。",
-        async () => {
-            const acc = state.accounts[state.currentUser];
-            acc.isTwoFactorEnabled = false;
-            acc.twoFactorEmail = null;
-
-            await pushStateToServer();
-            showSuccessOverlay("解除完了", "2段階認証設定を解除しました。");
-            setTimeout(() => {
-                showScreen("settings");
-            }, 2200);
-        }
-    );
-});
 
 // --- PERIODIC BACKGROUND AUTOMATIC SYNCHRONIZATION ---
 setInterval(async () => {
@@ -1294,10 +1106,6 @@ setInterval(async () => {
                 const acc = state.accounts[state.currentUser];
                 document.getElementById("transfer-available-balance").innerText = formatCurrency(acc.balance);
             } else if (activeScreen === "settings") {
-                const activeSubView = document.querySelector(".sub-screen-view.active-view");
-                if (activeSubView && activeSubView.id === "settings-2fa-view") {
-                    updateTwoFactorSetupView();
-                }
                 updateSettingsPortalView();
             }
         }
