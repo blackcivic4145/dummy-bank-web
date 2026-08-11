@@ -8,7 +8,7 @@ const state = {
         test: {
             ownerName: "テスト タロウ",
             accountNumber: "123-4567-890",
-            balance: 20000,
+            balance: 1284500,
             transactions: [
                 { id: "tx_001", date: "2026-08-10", description: "給与振込（株式会社デモ）", amount: 350000, type: "deposit" },
                 { id: "tx_002", date: "2026-08-08", description: "スーパー マルエツ", amount: 5420, type: "withdrawal" },
