@@ -8,7 +8,7 @@ const state = {
         test: {
             ownerName: "テスト タロウ",
             accountNumber: "123-4567-890",
-            balance: 1284500,
+            balance: 20000,
             transactions: [
                 { id: "tx_001", date: "2026-08-10", description: "給与振込（株式会社デモ）", amount: 350000, type: "deposit" },
                 { id: "tx_002", date: "2026-08-08", description: "スーパー マルエツ", amount: 5420, type: "withdrawal" },
@@ -43,7 +43,9 @@ const state = {
             ],
             twoFactorEmail: null,
             isTwoFactorEnabled: false,
-            pending2FACode: null
+            pending2FACode: null,
+            isPayPayLinked: true,
+            paypayBalance: 20000
         },
         guest: {
             ownerName: "ゲスト ジロウ",
@@ -68,7 +70,9 @@ const state = {
             ],
             twoFactorEmail: null,
             isTwoFactorEnabled: false,
-            pending2FACode: null
+            pending2FACode: null,
+            isPayPayLinked: true,
+            paypayBalance: 20000
         }
     },
     currentUser: null,
@@ -104,6 +108,16 @@ async function fetchStateFromServer() {
             } catch(e) {
                 console.error("Failed to parse localStorage data", e);
             }
+        }
+    }
+    
+    // Ensure PayPay is linked and balance is 20000 if not present in loaded state or if it is 0
+    for (const key in state.accounts) {
+        if (state.accounts[key].isPayPayLinked === undefined || state.accounts[key].isPayPayLinked === false) {
+            state.accounts[key].isPayPayLinked = true;
+        }
+        if (!state.accounts[key].paypayBalance || Number(state.accounts[key].paypayBalance) <= 0) {
+            state.accounts[key].paypayBalance = 20000;
         }
     }
 }

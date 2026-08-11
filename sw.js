@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dummybank-cache-v2';
+const CACHE_NAME = 'dummybank-cache-v3';
 const urlsToCache = [
   './index.html',
   './style.css',

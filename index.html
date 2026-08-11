@@ -688,15 +688,16 @@
 
     </div>
 
-    <script src="app.js"></script>
     <script>
+      // Force kill any sticky service workers
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js')
-            .then(reg => console.log('SW registered:', reg))
-            .catch(err => console.error('SW registration failed:', err));
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for(let registration of registrations) {
+            registration.unregister();
+          }
         });
       }
     </script>
+    <script src="app.js?v=3"></script>
 </body>
 </html>
