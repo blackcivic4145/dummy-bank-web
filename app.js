@@ -1171,9 +1171,17 @@ document.getElementById("send-2fa-code-btn").addEventListener("click", () => {
     const code = Math.floor(100000 + Math.random() * 900000).toString();
     state.generatedCode = code;
 
-    // Simulate メール dispatch dialog
-    document.getElementById("email-code-display").innerText = code;
-    document.getElementById("email-modal").classList.remove("hidden");
+    // Generate and download mock email file
+    const emailContent = `To: ${email}\nFrom: security@dummybank.com\nSubject: 【DummyBank】2段階認証コード\n\nあなたの認証コードは以下の通りです。\n[ ${code} ]\n\nこのコードの有効期限は3分です。`;
+    const blob = new Blob([emailContent], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "email_from_dummybank.txt";
+    a.click();
+    URL.revokeObjectURL(url);
+
+    showSuccessOverlay("メール送信完了", "認証コードが記載されたファイルがダウンロードされました。ファイルを開き、記載されたコードを入力してください。");
 
     // Setup input code section
     document.getElementById("two-factor-code-section").classList.remove("hidden");
@@ -1197,9 +1205,7 @@ document.getElementById("send-2fa-code-btn").addEventListener("click", () => {
     }, 1000);
 });
 
-// Close メール modal
-document.getElementById("close-email-modal-btn").onclick = () => document.getElementById("email-modal").classList.add("hidden");
-document.getElementById("close-email-modal-bottom-btn").onclick = () => document.getElementById("email-modal").classList.add("hidden");
+
 
 // Submit verification code
 document.getElementById("two-factor-setup-form").addEventListener("submit", async (e) => {
