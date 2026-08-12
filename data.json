@@ -1,0 +1,130 @@
+{
+  "test": {
+    "bankCode": "001",
+    "branchCode": "001",
+    "accountNumber": "1234567890",
+    "balance": 1284500,
+    "ownerName": "テスト タロウ",
+    "transactions": [
+      {
+        "id": "tx_001",
+        "date": "2026-08-10",
+        "description": "給与振込（株式会社デモ）",
+        "amount": 350000,
+        "type": "deposit"
+      },
+      {
+        "id": "tx_002",
+        "date": "2026-08-08",
+        "description": "スーパー マルエツ",
+        "amount": 5420,
+        "type": "withdrawal"
+      },
+      {
+        "id": "tx_003",
+        "date": "2026-08-05",
+        "description": "東京電力（電気料金）",
+        "amount": 12800,
+        "type": "withdrawal"
+      },
+      {
+        "id": "tx_004",
+        "date": "2026-08-01",
+        "description": "家賃振込（デモ不動産）",
+        "amount": 85000,
+        "type": "withdrawal"
+      },
+      {
+        "id": "tx_005",
+        "date": "2026-07-28",
+        "description": "セブン銀行ATM お引出し",
+        "amount": 30000,
+        "type": "withdrawal"
+      },
+      {
+        "id": "tx_006",
+        "date": "2026-07-25",
+        "description": "ドトールコーヒー",
+        "amount": 650,
+        "type": "withdrawal"
+      },
+      {
+        "id": "tx_007",
+        "date": "2026-07-20",
+        "description": "他行振込（ヤマダ ハナコ）",
+        "amount": 15000,
+        "type": "deposit"
+      }
+    ],
+    "savingsAccounts": [
+      {
+        "id": "sv_001",
+        "type": "FIXED",
+        "amount": 500000,
+        "interestRate": 0.15,
+        "termMonths": 12,
+        "startDate": "2026-01-15",
+        "maturityDate": "2027-01-15",
+        "maturityInstruction": "AUTO_RENEW_WITH_INTEREST"
+      },
+      {
+        "id": "sv_002",
+        "type": "ACCUMULATION",
+        "amount": 120000,
+        "monthlyDepositAmount": 10000,
+        "depositDay": 25,
+        "interestRate": 0.18,
+        "termMonths": 24,
+        "startDate": "2025-08-25",
+        "maturityDate": "2027-08-25",
+        "maturityInstruction": "AUTO_CANCEL"
+      }
+    ],
+    "isPayPayLinked": true,
+    "paypayBalance": 20000
+  },
+  "guest": {
+    "bankCode": "001",
+    "branchCode": "002",
+    "accountNumber": "0987654321",
+    "balance": 500000,
+    "ownerName": "ゲスト ジロウ",
+    "transactions": [
+      {
+        "id": "tx_g01",
+        "date": "2026-08-10",
+        "description": "給料振込（株式会社サンプル）",
+        "amount": 200000,
+        "type": "deposit"
+      },
+      {
+        "id": "tx_g02",
+        "date": "2026-08-07",
+        "description": "ファミリーマート",
+        "amount": 1200,
+        "type": "withdrawal"
+      },
+      {
+        "id": "tx_g03",
+        "date": "2026-08-02",
+        "description": "家賃引き落とし",
+        "amount": 60000,
+        "type": "withdrawal"
+      }
+    ],
+    "savingsAccounts": [
+      {
+        "id": "sv_g01",
+        "type": "FIXED",
+        "amount": 100000,
+        "interestRate": 0.1,
+        "termMonths": 6,
+        "startDate": "2026-05-10",
+        "maturityDate": "2026-11-10",
+        "maturityInstruction": "AUTO_CANCEL"
+      }
+    ],
+    "isPayPayLinked": true,
+    "paypayBalance": 20000
+  }
+}
