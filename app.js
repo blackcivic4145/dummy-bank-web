@@ -110,8 +110,7 @@ async function fetchStateFromServer() {
         const res = await fetch(`${GH_API_URL}?t=${Date.now()}`, {
             headers: {
                 "Authorization": `token ${GH_TOKEN}`,
-                "Accept": "application/vnd.github.v3+json",
-                "Cache-Control": "no-cache"
+                "Accept": "application/vnd.github.v3+json"
             }
         });
         if (res.ok) {
@@ -158,8 +157,7 @@ async function pushStateToServer() {
         const getRes = await fetch(`${GH_API_URL}?t=${Date.now()}`, {
             headers: {
                 "Authorization": `token ${GH_TOKEN}`,
-                "Accept": "application/vnd.github.v3+json",
-                "Cache-Control": "no-cache"
+                "Accept": "application/vnd.github.v3+json"
             }
         });
         if (!getRes.ok) throw new Error("Could not get SHA");
