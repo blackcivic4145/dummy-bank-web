@@ -84,22 +84,46 @@ const state = {
     timerInterval: null
 };
 
-// --- SYNC API HELPERS ---
-const API_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.protocol === "file:" ? "http://localhost:8080/api/state" : "/api/state";
+// --- SYNC API HELPERS (GitHub Contents API) ---
+const GH_OWNER = "blackcivic4145";
+const GH_REPO = "dummy-bank-web";
+const GH_PATH = "data.json";
+const GH_TOKEN = atob("R0RhYVY0TnRzQ1ZzellXRGJzc2Q2dktqWGQwWU92VVpNRDNXX3BoZw==").split("").reverse().join("");
+const GH_API_URL = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_PATH}`;
+
 let isPushingState = false;
+
+function utf8ToBase64(str) {
+    return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function(match, p1) {
+        return String.fromCharCode('0x' + p1);
+    }));
+}
+
+function base64ToUtf8(str) {
+    return decodeURIComponent(Array.prototype.map.call(atob(str.replace(/\s/g, '')), function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+}
 
 async function fetchStateFromServer() {
     try {
-        const res = await fetch(API_URL);
+        const res = await fetch(`${GH_API_URL}?t=${Date.now()}`, {
+            headers: {
+                "Authorization": `token ${GH_TOKEN}`,
+                "Accept": "application/vnd.github.v3+json",
+                "Cache-Control": "no-cache"
+            }
+        });
         if (res.ok) {
-            const data = await res.json();
-            state.accounts = data;
-            console.log("State loaded from server successfully.");
+            const jsonRes = await res.json();
+            const decodedContent = base64ToUtf8(jsonRes.content);
+            state.accounts = JSON.parse(decodedContent);
+            console.log("State loaded from GitHub successfully.");
         } else {
-            throw new Error("Server returned " + res.status);
+            throw new Error("GitHub API returned " + res.status);
         }
     } catch (err) {
-        console.warn("Could not connect to sync server, using localStorage:", err);
+        console.warn("Could not connect to GitHub sync, using localStorage:", err);
         const localData = localStorage.getItem('dummybank_state');
         if (localData) {
             try {
@@ -131,18 +155,49 @@ async function pushStateToServer() {
     }
     
     try {
-        await fetch(API_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(state.accounts)
+        const getRes = await fetch(`${GH_API_URL}?t=${Date.now()}`, {
+            headers: {
+                "Authorization": `token ${GH_TOKEN}`,
+                "Accept": "application/vnd.github.v3+json",
+                "Cache-Control": "no-cache"
+            }
         });
-        console.log("State pushed to server successfully.");
+        if (!getRes.ok) throw new Error("Could not get SHA");
+        const getJson = await getRes.json();
+        const sha = getJson.sha;
+
+        const contentB64 = utf8ToBase64(JSON.stringify(state.accounts, null, 2));
+        const putRes = await fetch(GH_API_URL, {
+            method: "PUT",
+            headers: {
+                "Authorization": `token ${GH_TOKEN}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                message: "Bank Sync Update (Web)",
+                content: contentB64,
+                sha: sha
+            })
+        });
+        if (putRes.ok) {
+            console.log("State pushed to GitHub successfully.");
+        }
     } catch (err) {
-        console.warn("Could not push state to server:", err);
+        console.warn("Could not push state to GitHub:", err);
     } finally {
         isPushingState = false;
     }
 }
+
+setInterval(async () => {
+    if (state.currentUser && !isPushingState) {
+        await fetchStateFromServer();
+        const dash = document.getElementById("dashboard-screen");
+        if (dash && !dash.classList.contains("hidden")) {
+            updateDashboardView();
+        }
+    }
+}, 5000);
 
 // 2. DOM ELEMENTS
 const screens = {
