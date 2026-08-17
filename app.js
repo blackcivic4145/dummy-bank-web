@@ -238,7 +238,23 @@ async function showScreen(screenId) {
 
     // Reset page states on load
     if (screenId === "dashboard") {
-        await fetchStateFromServer();
+        try {
+            await fetchStateFromServer();
+        } catch (e) {
+            console.warn("fetchStateFromServer failed", e);
+        }
+        if (!state.accounts || !state.accounts[state.currentUser]) {
+            state.accounts = state.accounts || {};
+            state.accounts[state.currentUser] = {
+                ownerName: state.currentUser === "test" ? "テスト タロウ" : "ゲスト ジロウ",
+                accountNumber: state.currentUser === "test" ? "123-4567-890" : "098-7654-321",
+                balance: state.currentUser === "test" ? 1284500 : 500000,
+                transactions: [],
+                savingsAccounts: [],
+                isPayPayLinked: true,
+                paypayBalance: 20000
+            };
+        }
         updateDashboardView();
     } else if (screenId === "transfer") {
         await fetchStateFromServer();
@@ -306,7 +322,7 @@ togglePasswordBtn.addEventListener("click", () => {
 loginForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const username = document.getElementById("login-username").value.trim().toLowerCase();
-    const password = passwordInput.value;
+    const password = passwordInput.value.trim().toLowerCase();
 
     if ((username === "test" && password === "test") || (username === "guest" && password === "guest")) {
         state.currentUser = username;
@@ -314,6 +330,10 @@ loginForm.addEventListener("submit", (e) => {
         loginForm.reset();
         showScreen("dashboard");
     } else {
+        const errorMsgEl = document.getElementById("login-error-message");
+        if (errorMsgEl) {
+            errorMsgEl.innerText = "IDまたはパスワードが正しくありません。";
+        }
         loginErrorBanner.classList.remove("hidden");
     }
 });
