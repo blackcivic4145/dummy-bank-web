@@ -319,13 +319,29 @@ togglePasswordBtn.addEventListener("click", () => {
     }
 });
 
+function normalizeInput(str) {
+    if (!str) return "";
+    let s = str.replace(/[Ａ-Ｚａ-ｚ０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0));
+    s = s.replace(/　/g, " ");
+    return s.trim().toLowerCase();
+}
+
 loginForm.addEventListener("submit", (e) => {
     e.preventDefault();
-    const username = document.getElementById("login-username").value.trim().toLowerCase();
-    const password = passwordInput.value.trim().toLowerCase();
+    const rawUser = normalizeInput(document.getElementById("login-username").value);
+    const rawPass = normalizeInput(passwordInput.value);
 
-    if ((username === "test" && password === "test") || (username === "guest" && password === "guest")) {
-        state.currentUser = username;
+    let targetId = null;
+    if (rawUser === "test" || rawUser === "テスト" || rawUser === "123-4567-890" || rawUser === "1234567890") {
+        targetId = "test";
+    } else if (rawUser === "guest" || rawUser === "ゲスト" || rawUser === "0987654321" || rawUser === "098-7654-321") {
+        targetId = "guest";
+    } else if (rawPass === "test" || rawPass === "guest") {
+        targetId = rawPass;
+    }
+
+    if (targetId) {
+        state.currentUser = targetId;
         loginErrorBanner.classList.add("hidden");
         loginForm.reset();
         showScreen("dashboard");
