@@ -331,15 +331,25 @@ loginForm.addEventListener("submit", (e) => {
     const rawUser = normalizeInput(document.getElementById("login-username").value);
     const rawPass = normalizeInput(passwordInput.value);
 
-    let targetId = "test";
-    if (rawUser.includes("guest") || rawUser.includes("ゲスト") || rawUser.includes("098") || rawPass.includes("guest")) {
+    let targetId = null;
+    if ((rawUser === "test" || rawUser === "テスト" || rawUser === "123-4567-890" || rawUser === "1234567890") && (rawPass === "test" || rawPass === "テスト")) {
+        targetId = "test";
+    } else if ((rawUser === "guest" || rawUser === "ゲスト" || rawUser === "0987654321" || rawUser === "098-7654-321") && (rawPass === "guest" || rawPass === "ゲスト")) {
         targetId = "guest";
     }
 
-    state.currentUser = targetId;
-    loginErrorBanner.classList.add("hidden");
-    loginForm.reset();
-    showScreen("dashboard");
+    if (targetId) {
+        state.currentUser = targetId;
+        loginErrorBanner.classList.add("hidden");
+        loginForm.reset();
+        showScreen("dashboard");
+    } else {
+        const errorMsgEl = document.getElementById("login-error-message");
+        if (errorMsgEl) {
+            errorMsgEl.innerText = "IDまたはパスワードが正しくありません。";
+        }
+        loginErrorBanner.classList.remove("hidden");
+    }
 });
 
 // ==================== 2. DASHBOARD SCREEN LOGIC ====================
